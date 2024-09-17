@@ -1,0 +1,52 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+//consider onetoone is a user
+model Onetoone {
+  id    Int    @id @unique() @default(autoincrement())
+  name  String
+  email String @unique
+  ones  Ones?
+}
+
+//conside ones as user profile 
+model Ones {
+  id       Int      @id @unique() @default(autoincrement())
+  email    String   @unique()
+  salary   Int
+  onetoone Onetoone @relation(fields: [email], references: [email])
+}
+
+//consider onetomany as a posts
+model Onetomany {
+  id    Int     @id @unique() @default(autoincrement())
+  title String
+  urls  Manys[]
+}
+
+//consider this as a url model
+model Manys {
+  id        Int       @id @unique() @default(autoincrement())
+  url       String
+  postId    Int //the value of this field is same as the id field in onetomany 
+  onetomany Onetomany @relation(fields: [postId], references: [id])
+}
+
+model Users {
+  id       String @id @unique() @default(uuid())
+  name     String
+  email    String @unique()
+  password String
+}
